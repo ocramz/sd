@@ -1,5 +1,5 @@
 {-# language DeriveFunctor #-}
-module Lib where
+module Numeric.SD where
 
 import qualified Data.IntMap.Strict as IM
 
@@ -147,3 +147,4 @@ env0 :: Env Double
 env0 = Env $ IM.fromList [(0, 5.0), (1, 2.0)]
 
 t0 = grad env0 e0
+
