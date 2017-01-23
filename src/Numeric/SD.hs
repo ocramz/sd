@@ -103,6 +103,7 @@ diff _ (Const _) = Const 0
 diff e (Var x) | x == e = Const 1
                | otherwise = Const 0
 diff e (a :+: b) = diff e a :+: diff e b
+diff e (a :-: b) = diff e a :-: diff e b
 diff e (a :*: b) = (a :*: diff e b) :+: (b :*: diff e a) -- product rule
 diff e (a :^: Const x) = Const x :*: (a :^: (Const $ x-1)) :*: diff e a -- power rule
 diff e (a :/: b) = (diff e a :*: b) :+: negate' (diff e b :*: (b :^: Const 2))
@@ -114,8 +115,8 @@ grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr) e
 
 
 
-mapVar f (Var d)   = f d
-mapVar _ (Const a) = Const a
+-- mapVar f (Var d)   = f d
+-- mapVar _ (Const a) = Const a
 
 
 

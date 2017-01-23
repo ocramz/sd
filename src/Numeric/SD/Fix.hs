@@ -22,8 +22,6 @@ data ExprF a = ConstF
              | TimesF a a
              | DivF a a
              | ExpF a a
-            -- | Neg a
-            -- | ExpF a
             deriving (Eq, Functor)
 
 -- instance Show a => Show (Expr a) where
