@@ -28,13 +28,14 @@ executable sd
   main-is:             Main.hs
   build-depends:       base
                      , sd
+                     , hspec
 
 test-suite spec
   default-language:    Haskell2010
   ghc-options:         -Wall
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             Spec.hs
+  main-is:             LibSpec.hs
   build-depends:       base
                      , sd
                      , hspec
