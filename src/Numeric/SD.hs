@@ -132,19 +132,9 @@ eval e (a :/: b) = eval e a / eval e b
 eval e (a :^: b) = eval e a ** eval e b
 
 
+evalGrad :: (Floating a1, Eq a1) => Env a1 -> Expr a1 -> IM.IntMap a1
+evalGrad e expr = eval e <$> grad e expr
 
 
 
-
--- | test data
-
-e0, e1 :: Expr Double
-e0 = Const 3 :*: (Var 0 :^: Const 2) :+: (Var 1 :^: Const 3)  --3x^2+y^3
-
-e1 = Const 3 :*: (Var 1 :^: Const 2)  -- 3y^2
-
-env0 :: Env Double
-env0 = Env $ IM.fromList [(0, 5.0), (1, 2.0)]
-
-t0 = grad env0 e0
 
