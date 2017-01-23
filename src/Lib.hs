@@ -101,3 +101,11 @@ grad e (a :^: Const x) = Const x :*: (a :^: (Const $ x-1)) :*: grad e a -- power
 -- derivative (a :/: b)         = ((derivative a :*: b) :+: (negate' (derivative b :*: a))) 
 --                                :/: 
 --                                (b :^: (Const 2))
+
+
+
+
+
+newtype Fix f = Fix { unwrapFix :: f (Fix f) }
+
+cata alg f = alg . fmap (cata alg) $ unwrapFix f
