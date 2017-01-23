@@ -1,20 +1,15 @@
+{-# language DeriveFunctor #-}
 module Lib where
 
 import qualified Data.IntMap.Strict as IM
-import Data.Maybe
+
+
 
 
 -- | An binding environment; variables are indexed by integers
 newtype Env a = Env { unEnv :: IM.IntMap a} deriving (Eq, Show)
 
 -- newtype X = X { unX :: Int } deriving (Eq, Show)
-
-
-
-
-
-
-
 
 
 -- | Expression ADT
@@ -28,7 +23,21 @@ data Expr a = Const a
             | (Expr a) :-: (Expr a)
             | (Expr a) :*: (Expr a)
             | (Expr a) :/: (Expr a)
-            | (Expr a) :^: (Expr a) deriving (Eq, Show)
+            | (Expr a) :^: (Expr a) deriving (Eq, Functor)
+
+instance Show a => Show (Expr a) where
+  show (Const x) = show x
+  show (Var i) = showVar i
+  show (a :*: b) = "(" ++ show a ++ " * " ++ show b ++ ")"
+  show (a :+: b) = "(" ++ show a ++ " + " ++ show b ++ ")"
+  show (a :/: b) = "(" ++ show a ++ " / " ++ show b ++ ")"
+  show (a :-: b) = "(" ++ show a ++ " - " ++ show b ++ ")"  
+  show (a :^: b) = show a ++ "^" ++ show b
+
+-- | Show integer-labeled variables as consecutive letters starting from 'x'
+showVar i = [v !! i] where
+  v = cycle (['x' .. 'z'] ++ ['a' .. 'z'])
+
 
 -- | Negate an expression
 negate' :: Num a => Expr a -> Expr a
@@ -72,10 +81,13 @@ simplify (a :*: b)  = simplify a :*: simplify b
 simplify (a :+: b)  = simplify a :+: simplify b
 simplify x          = x
 
+
+-- | `fullSimplify` runs `simplify` on an expression until the current input matches the last output of simplify (which ensures an expression is completely simplified). In other words, the simplified expression is the fixed point of the simplifying algoritm
+fullSimplify :: (Floating a, Eq a) => Expr a -> Expr a
 fullSimplify expr = fullSimplify' expr (Const 0) -- placeholder
-  where fullSimplify' cur l | cur == l = cur
-                            | otherwise = let cur' = simplify cur
-                                          in fullSimplify' cur' cur
+  where fullSimplify' c l | c == l = c
+                          | otherwise = let c' = simplify c
+                                        in fullSimplify' c' c
 
 
 
@@ -83,29 +95,40 @@ fullSimplify expr = fullSimplify' expr (Const 0) -- placeholder
 -- | Differentiation
 -- "Constant" and "variable" are only defined wrt a binding environment
 
-grad :: Num a => Env e -> Expr a -> Expr a
-grad _ (Const _) = Const 0
-grad (Env e) (Var x) = maybe (Const 0) (\_ -> Const 1) (IM.lookup x e)
-grad e (a :+: b) = grad e a :+: grad e b
-grad e (a :*: b) = (a :*: grad e b) :+: (b :*: grad e a) -- product rule
-grad e (a :^: Const x) = Const x :*: (a :^: (Const $ x-1)) :*: grad e a -- power rule
+-- diff :: Num a => Int -> Expr a -> Expr a
+diff _ (Const _) = Const 0
+-- diff (Env e) (Var x) = maybe (Const 0) (\_ -> Const 1) (IM.lookup x e)
+diff e (Var x) | x == e = Const 1
+               | otherwise = Const 0
+diff e (a :+: b) = diff e a :+: diff e b
+diff e (a :*: b) = (a :*: diff e b) :+: (b :*: diff e a) -- product rule
+diff e (a :^: Const x) = Const x :*: (a :^: (Const $ x-1)) :*: diff e a -- power rule
+diff e (a :/: b) = (diff e a :*: b) :+: negate' (diff e b :*: (b :^: Const 2))
 
--- derivative (Var c)           = Const 1
--- derivative (Const x)         = Const 0
--- --product rule (ab' + a'b)
--- derivative (a :*: b)         = (a :*: (derivative b)) :+:  (b :*: (derivative a)) -- product rule
---  --power rule (xa^(x-1) * a')
--- derivative (a :^: (Const x)) = ((Const x) :*: (a :^: (Const $ x-1))) :*: (derivative a)
--- derivative (a :+: b)         = (derivative a) :+: (derivative b)
---  -- quotient rule ( (a'b - b'a) / b^2 )
--- derivative (a :/: b)         = ((derivative a :*: b) :+: (negate' (derivative b :*: a))) 
---                                :/: 
---                                (b :^: (Const 2))
+
+-- | Gradient
+grad :: (Floating a, Eq a) => Env a1 -> Expr a -> IM.IntMap (Expr a)
+grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr) e
 
 
 
+mapVar f (Var d)   = f d
+mapVar _ (Const a) = Const a
 
 
-newtype Fix f = Fix { unwrapFix :: f (Fix f) }
 
-cata alg f = alg . fmap (cata alg) $ unwrapFix f
+-- newtype Fix f = Fix { unwrapFix :: f (Fix f) }
+
+-- cata alg f = alg . fmap (cata alg) $ unwrapFix f
+
+
+
+-- | test data
+
+expr0 :: Expr Double
+expr0 = Const 3 :*: (Var 0 :^: Const 2) :+: (Var 1 :^: Const 3)  --3x^2+y^3
+
+env0 :: Env Double
+env0 = Env $ IM.fromList [(0, 5.0), (1, 2.0)]
+
+t0 = grad env0 expr0
