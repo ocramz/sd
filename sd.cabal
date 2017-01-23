@@ -1,18 +1,18 @@
 name:                sd
 version:             0.1.0.0
-synopsis:            TODO Initial project template from stack
+synopsis:            Symbolic differentiation in Haskell
 description:         Please see README.md
 homepage:            https://github.com/ocramz/sd
 license:             BSD3
 license-file:        LICENSE
 author:              Marco Zocca
-maintainer:          example@example.com
+maintainer:          zocca marco gmail
 copyright:           2017 Marco Zocca
 category:            Acme
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
-tested-with:         GHC == 7.10.2
+tested-with:         GHC == 8.0.1
 
 library
   default-language:    Haskell2010
@@ -20,6 +20,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lib
   build-depends:       base >= 4.7 && < 5
+                     , containers >= 0.5.7 && < 0.6
 
 executable sd
   default-language:    Haskell2010
@@ -28,7 +29,6 @@ executable sd
   main-is:             Main.hs
   build-depends:       base
                      , sd
-                     , hspec
 
 test-suite spec
   default-language:    Haskell2010
