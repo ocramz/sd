@@ -9,19 +9,32 @@ Symbolic multivariate differentiation in Haskell
 
 In `sd`, free variables are indexed by integer numbers:
 
-    ix = 0
-    iy = 1
-    x = Var ix
-    y = Var iy
+    > ix = 0
+    > iy = 1
+    > x = Var ix
+    > y = Var iy
 
 Suppose we define the expression `3x^2+y^3` :
 
-    e0 = Const 3 :*: (x :^: Const 2) :+: (y :^: Const 3)
+    > e0 = Const 3 :*: (x :^: Const 2) :+: (y :^: Const 3)
     
 and a suitable binding environment, relating the free variables to their value:
 
-    env0 = Env $ IM.fromList [(ix, 5.0), (iy, 2.0)]
+    > env0 = Env $ IM.fromList [(ix, 5.0), (iy, 2.0)]
 
+We can then require the _gradient_ of `e0` as follows:
+
+    > g = grad env0 e0
+
+    > g 
+    fromList [(0,(6.0 * x)),(1,(3.0 * y^2.0))]
+
+Behind the scenes, `grad` differentiates the expression with respect to each of the variables in the binding, which in turn means applying mechanically a number of rewriting and simplification passes. The result is a new IntMap which contains the expressions for the partial derivatives.
+
+Finally, the _numerical value_ of the partial derivatives is obtained by substitution of the bindings:
+
+    > eval env0 <$> g
+    fromList [(0,30.0),(1,12.0)]
 
 
 ## Credits and inspiration
