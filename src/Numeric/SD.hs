@@ -26,6 +26,8 @@ data Expr a = Const a
             | (Expr a) :/: (Expr a)
             | (Expr a) :^: (Expr a)
             | Log a (Expr a)
+            | Ln (Expr a)
+            | Exp (Expr a)  
             deriving (Eq, Functor)
 
 instance Show a => Show (Expr a) where
@@ -36,6 +38,9 @@ instance Show a => Show (Expr a) where
   show (a :/: b) = "(" ++ show a ++ " / " ++ show b ++ ")"
   show (a :-: b) = "(" ++ show a ++ " - " ++ show b ++ ")"  
   show (a :^: b) = show a ++ "^" ++ show b
+  show (Log b x) = "log_" ++ show b ++ "("++show x++")"
+  show (Ln x) = "ln("++show x++")"  
+  show (Exp x) = "exp("++show x++")"
 
 -- | Show integer-labeled variables as consecutive letters starting from 'x'
 showVar :: Int -> String
@@ -52,7 +57,9 @@ negate' (a :-: b)  = b :-: a
 negate' (a :*: b)  = negate' a :*: b
 negate' (a :^: b)  = Const (-1) :*: a :^: b
 negate' (a :/: b)  = negate' a :/: b
-negate' (Log b e)  = Const (-1) :*: Log b e  
+negate' (Log b e)  = Const (-1) :*: Log b e
+negate' (Ln e)  = Const (-1) :*: Ln e
+negate' x = Const (-1) :*: x
 
 
 -- | Some basic simplifications
@@ -86,6 +93,8 @@ simplify (a :/: b)  = simplify a :/: simplify b
 simplify (a :^: b)  = simplify a :^: simplify b
 simplify (a :*: b)  = simplify a :*: simplify b
 simplify (a :+: b)  = simplify a :+: simplify b
+simplify (Log b x)  = Log b (simplify x)
+simplify (Ln (Exp x)) = simplify x
 simplify x          = x
 
 
