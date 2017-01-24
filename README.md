@@ -23,7 +23,7 @@ Suppose we define the expression `3x^2+y^3` :
     
 and a suitable binding environment, relating the free variables to their value:
 
-    > env0 = Env $ IM.fromList [(ix, 5.0), (iy, 2.0)]
+    > env0 = fromListEnv [(ix, 5.0), (iy, 2.0)]
 
 We can then require the _gradient_ of `e0` as follows:
 
