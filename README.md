@@ -25,7 +25,7 @@ and a suitable binding environment, relating the free variables to their value:
 
     > env0 = fromListEnv [(ix, 5.0), (iy, 2.0)]
 
-We can then require the _gradient_ of `e0` as follows:
+We can then require the _gradient_ of `f` as follows:
 
     > g = grad env0 f
 
