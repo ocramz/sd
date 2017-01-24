@@ -24,7 +24,9 @@ data Expr a = Const a
             | (Expr a) :-: (Expr a)
             | (Expr a) :*: (Expr a)
             | (Expr a) :/: (Expr a)
-            | (Expr a) :^: (Expr a) deriving (Eq, Functor)
+            | (Expr a) :^: (Expr a)
+            | Log a (Expr a)
+            deriving (Eq, Functor)
 
 instance Show a => Show (Expr a) where
   show (Const x) = show x
@@ -36,6 +38,7 @@ instance Show a => Show (Expr a) where
   show (a :^: b) = show a ++ "^" ++ show b
 
 -- | Show integer-labeled variables as consecutive letters starting from 'x'
+showVar :: Int -> String
 showVar i = [v !! i] where
   v = cycle (['x' .. 'z'] ++ ['a' .. 'z'])
 
@@ -45,9 +48,11 @@ negate' :: Num a => Expr a -> Expr a
 negate' (Var c)    = Const (-1) :*: Var c
 negate' (Const a)  = Const (-a)
 negate' (a :+: b)  = negate' a :+: negate' b
+negate' (a :-: b)  = b :-: a
 negate' (a :*: b)  = negate' a :*: b
 negate' (a :^: b)  = Const (-1) :*: a :^: b
 negate' (a :/: b)  = negate' a :/: b
+negate' (Log b e)  = Const (-1) :*: Log b e  
 
 
 -- | Some basic simplifications
@@ -107,6 +112,7 @@ diff e (a :-: b) = diff e a :-: diff e b
 diff e (a :*: b) = (a :*: diff e b) :+: (b :*: diff e a) -- product rule
 diff e (a :^: Const x) = Const x :*: (a :^: (Const $ x-1)) :*: diff e a -- power rule
 diff e (a :/: b) = (diff e a :*: b) :+: negate' (diff e b :*: (b :^: Const 2))
+-- diff e (Log b x) = 1 :/: (x :*: Const (log b))  -- ?
 
 
 -- | Gradient
