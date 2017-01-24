@@ -11,18 +11,15 @@ import Data.Fix (Fix(..), cata)
 newtype Env a = Env { unEnv :: IM.IntMap a} deriving (Eq, Show)
 
 -- | Expression ADT
--- infixl 4 :+:
--- infixl 5 :*:, :/:
--- infixr 6 :^:
-
 data ExprF a = ConstF
              | VarF Int
-             | AddF a a
-             | MinusF a a
-             | TimesF a a
-             | DivF a a
-             | ExpF a a
+             | a :+: a
+             | a :-: a
+             | a :*: a
+             | a :/: a
+             | a :^: a
             deriving (Eq, Functor)
+ 
 
 -- instance Show a => Show (Expr a) where
 --   show (Const x) = show x
@@ -34,25 +31,55 @@ data ExprF a = ConstF
 --   show (a :^: b) = show a ++ "^" ++ show b
 
 -- | Show integer-labeled variables as consecutive letters starting from 'x'
-showVar i = [v !! i] where
+showIntVar :: Int -> String
+showIntVar i = [v !! i] where
   v = cycle (['x' .. 'z'] ++ ['a' .. 'z'])
 
 type Expr = Fix ExprF
 
 
-add :: Expr -> Expr -> Expr
-add a b = Fix (AddF a b)
+add, sub, times, frac :: Expr -> Expr -> Expr
+add a b = Fix (a :+: b)
+sub a b = Fix (a :-: b)
+times a b = Fix (a :*: b)
+frac a b = Fix (a :*: b)
+
+var :: Int -> Expr
+var = Fix . VarF
+
+konst = Fix ConstF
 
 eval :: Floating a => a -> Fix ExprF -> a
 eval x = cata $ \e -> case e of
   ConstF -> x
-  AddF a b -> a + b
-  MinusF a b -> a - b
-  TimesF a b -> a * b
-  DivF a b -> a / b
-  ExpF a b -> a**b
+  a :+: b -> a + b
+  a :-: b -> a - b
+  a :*: b -> a * b
+  a :/: b -> a / b
+  a :^: b -> a**b
 
 
+kata :: (a -> b -> b) -> b -> [a] -> b
+kata c z (x:xs) = c x (kata c z xs)
+kata _ z []     = z
+
+para :: (a -> ([a], b) -> b) -> b -> [a] -> b
+para c z (x:xs) = c x (xs, para c z xs)
+para _ z []     = z
+
+ana :: (a -> (b, a)) -> a -> [b]
+ana u x | (a,y)       <- u x = a : ana u y
+
+ana' :: (a -> (b, a)) -> a -> [b]
+ana' u x = let (a, y) = u x
+           in a : ana' u y
+
+apo :: (a -> (b, Either [b] a)) -> a -> [b]
+apo u x | (a, Right y) <- u x = a : apo u y
+        | (a, Left  b) <- u x = a : b
+
+apo' u x = case u x of (a, Right y) -> a : apo' u y
+                       (a, Left b) -> a : b
 
 -- | Paramorphism
 
@@ -68,4 +95,4 @@ eval x = cata $ \e -> case e of
 
 
 -- para :: Functor f => (f (Fix f, a) -> a) -> Fix f -> a
-para t = p where p x = t . fmap ((,) <*> p) $ unFix x
+-- para t = p where p x = t . fmap ((,) <*> p) $ unFix x

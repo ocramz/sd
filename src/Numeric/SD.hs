@@ -111,9 +111,8 @@ fullSimplify expr = fullSimplify' expr (Const 0) -- placeholder
 -- | Differentiation
 -- "Constant" and "variable" are only defined wrt a binding environment
 
--- diff :: Num a => Int -> Expr a -> Expr a
+diff :: Num a => Int -> Expr a -> Expr a
 diff _ (Const _) = Const 0
--- diff (Env e) (Var x) = maybe (Const 0) (\_ -> Const 1) (IM.lookup x e)
 diff e (Var x) | x == e = Const 1
                | otherwise = Const 0
 diff e (a :+: b) = diff e a :+: diff e b
@@ -138,6 +137,7 @@ grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr) e
 
 -- | Evaluation
 
+-- | Evaluate an Expression, given a binding Environment
 eval :: Floating a => Env a -> Expr a -> a
 eval _ (Const c) = c
 eval (Env e) (Var x) = fromMaybe 0 (IM.lookup x e)
