@@ -18,6 +18,9 @@ Suppose we define the expression `3x^2+y^3` :
 
     > e0 = Const 3 :*: (x :^: Const 2) :+: (y :^: Const 3)
     
+    > e0
+    ((3.0 * x^2.0) + y^3.0)
+    
 and a suitable binding environment, relating the free variables to their value:
 
     > env0 = Env $ IM.fromList [(ix, 5.0), (iy, 2.0)]
