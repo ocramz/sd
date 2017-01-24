@@ -26,6 +26,21 @@ data Expr a = Const a
             | Exp (Expr a)  
             deriving (Eq, Functor)
 
+instance Num a => Num (Expr a) where
+  (+) = (:+:)
+  (-) = (:-:)
+  (*) = (:*:)
+  fromInteger = Const . fromInteger
+
+instance Num a => Fractional (Expr a) where  
+  (/) = (:/:)
+
+instance Floating a => Floating (Expr a) where  
+  (**) = (:^:)
+  pi = Const pi
+  exp = Exp
+  log = Ln
+
 instance Show a => Show (Expr a) where
   show (Const x) = show x
   show (Var i) = showVar i
@@ -37,6 +52,7 @@ instance Show a => Show (Expr a) where
   show (Log b x) = "log_" ++ show b ++ "("++show x++")"
   show (Ln x) = "ln("++show x++")"  
   show (Exp x) = "exp("++show x++")"
+
 
 
 
@@ -87,6 +103,7 @@ simplify (a :^: b)  = simplify a :^: simplify b
 simplify (a :*: b)  = simplify a :*: simplify b
 simplify (a :+: b)  = simplify a :+: simplify b
 simplify (Log b x)  = Log b (simplify x)
+simplify (Exp x)    = Exp (simplify x)
 simplify (Ln (Exp x)) = simplify x
 simplify x          = x
 
@@ -133,7 +150,8 @@ diff e (a :-: b) = diff e a :-: diff e b
 diff e (a :*: b) = (a :*: diff e b) :+: (b :*: diff e a) -- product rule
 diff e (a :^: Const x) = Const x :*: (a :^: (Const $ x-1)) :*: diff e a -- power rule
 diff e (a :/: b) = (diff e a :*: b) :+: negate' (diff e b :*: (b :^: Const 2))
--- diff e (Log b x) = 1 :/: (x :*: Const (log b))  -- ?
+diff e (Exp x) = diff e x :*: Exp x
+ -- diff e (Log b x) = 1 :/: (x :*: Const (log b))  -- ?
 
 
 -- | Gradient
