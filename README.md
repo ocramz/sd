@@ -46,8 +46,14 @@ I started `sd` after reading this blog by Ben Kovach (from which I also shameles
 
 * https://5outh.blogspot.se/2013/05/symbolic-calculus-in-haskell.html
 
-Currently, I am trying to factor out the recursion from the gradient and evaluation algorithm, using _recursion schemes_ as suggested in Jared Tobin's blog:
+This can be enhanced in multiple ways, for example by factoring out the recursion from the gradient and evaluation algorithm, using the Fix recursive type and _recursion schemes_ :
 
 * https://jtobin.io/ad-via-recursion-schemes
 
+and perhaps by augmenting the abstract syntax with `Let` constructors to achieve _sharing of common sub-expressions_ :
+
 * https://jtobin.io/sharing-in-haskell-edsls
+
+Alternatively, the free monad route lets us use `do` notation as well:
+
+* http://dlaing.org/cofun/posts/free_and_cofree.html
