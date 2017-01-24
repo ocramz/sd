@@ -32,7 +32,7 @@ We can then require the _gradient_ of `e0` as follows:
     > g 
     fromList [(0,(6.0 * x)),(1,(3.0 * y^2.0))]
 
-Behind the scenes, `grad` differentiates the expression with respect to each of the variables in the binding, which in turn means applying mechanically a number of rewriting and simplification passes. The result is a new IntMap which contains the expressions for the partial derivatives.
+Behind the scenes, `grad` differentiates the expression with respect to each of the variables in the binding, which in turn means applying mechanically a number of rewriting and simplification passes. The result is a new IntMap which contains the _symbolic_ expressions for the partial derivatives.
 
 Finally, the _numerical value_ of the partial derivatives is obtained by substitution of the bindings:
 
