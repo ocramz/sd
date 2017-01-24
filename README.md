@@ -14,7 +14,7 @@ In `sd`, free variables are indexed by integer numbers:
     > x = Var ix
     > y = Var iy
 
-Now we can define for example expression `3x^2+y^3` :
+Now we can define for example a function of `x` and `y` such as `3x^2+y^3` :
 
     > e0 = 3 * x**2 + y**3
     
