@@ -39,9 +39,11 @@ Finally, the _numerical value_ of the partial derivatives is obtained by substit
 
 ## Credits and inspiration
 
-I started `sd` after reading this blog by Ben Kovach (from which I also shamelessly ripped the AST and the simplification code for the `Numeric.SD` module)
+I started `sd` after reading this blog by Ben Kovach (from which I also shamelessly ripped the AST and the simplification code for the `Numeric.SD` module):
 
 * https://5outh.blogspot.se/2013/05/symbolic-calculus-in-haskell.html
+
+Currently, I am trying to factor out the recursion from the gradient and evaluation algorithm, using _recursion schemes_ as suggested in Jared Tobin's blog:
 
 * https://jtobin.io/ad-via-recursion-schemes
 
