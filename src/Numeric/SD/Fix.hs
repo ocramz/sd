@@ -59,6 +59,10 @@ eval x = cata $ \e -> case e of
   a :^: b -> a**b
 
 
+
+
+
+
 kata :: (a -> b -> b) -> b -> [a] -> b
 kata c z (x:xs) = c x (kata c z xs)
 kata _ z []     = z

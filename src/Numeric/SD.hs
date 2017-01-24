@@ -1,16 +1,12 @@
 {-# language DeriveFunctor #-}
 module Numeric.SD where
 
+import Lib
+
 import qualified Data.IntMap.Strict as IM
 
 import Data.Maybe (fromMaybe)
 
-
-
--- | An binding environment; variables are indexed by integers
-newtype Env a = Env { unEnv :: IM.IntMap a} deriving (Eq, Show)
-
--- newtype X = X { unX :: Int } deriving (Eq, Show)
 
 
 -- | Expression ADT
@@ -42,10 +38,7 @@ instance Show a => Show (Expr a) where
   show (Ln x) = "ln("++show x++")"  
   show (Exp x) = "exp("++show x++")"
 
--- | Show integer-labeled variables as consecutive letters starting from 'x'
-showVar :: Int -> String
-showVar i = [v !! i] where
-  v = cycle (['x' .. 'z'] ++ ['a' .. 'z'])
+
 
 
 -- | Negate an expression
@@ -129,9 +122,6 @@ grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr) e
 
 
 
--- mapVar f (Var d)   = f d
--- mapVar _ (Const a) = Const a
-
 
 
 
@@ -140,7 +130,7 @@ grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr) e
 -- | Evaluate an Expression, given a binding Environment
 eval :: Floating a => Env a -> Expr a -> a
 eval _ (Const c) = c
-eval (Env e) (Var x) = fromMaybe 0 (IM.lookup x e)
+eval e (Var x) = lookupEnv0 x e
 eval e (a :+: b) = eval e a + eval e b
 eval e (a :*: b) = eval e a * eval e b
 eval e (a :-: b) = eval e a - eval e b
