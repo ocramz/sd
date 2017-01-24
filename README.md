@@ -7,12 +7,20 @@ Symbolic multivariate differentiation in Haskell
 
 ## Example
 
-    x = Var 0
-    y = Var 1
-    e0 = Const 3 :*: (x :^: Const 2) :+: (y :^: Const 3)  --3x^2+y^3
+In `sd`, free variables are indexed by integer numbers:
+
+    ix = 0
+    iy = 1
+    x = Var ix
+    y = Var iy
+
+Suppose we define the expression `3x^2+y^3` :
+
+    e0 = Const 3 :*: (x :^: Const 2) :+: (y :^: Const 3)
     
+and a suitable binding environment, relating the free variables to their value:
 
-
+    env0 = Env $ IM.fromList [(ix, 5.0), (iy, 2.0)]
 
 
 
