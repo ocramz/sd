@@ -16,9 +16,9 @@ In `sd`, free variables are indexed by integer numbers:
 
 Now we can define a function of `x` and `y` such as `3x^2+y^3` :
 
-    > e0 = 3 * x**2 + y**3
+    > f = 3 * x**2 + y**3
     
-    > e0
+    > f
     ((3.0 * x^2.0) + y^3.0)
     
 and a suitable binding environment, relating the free variables to their value:
@@ -27,7 +27,7 @@ and a suitable binding environment, relating the free variables to their value:
 
 We can then require the _gradient_ of `e0` as follows:
 
-    > g = grad env0 e0
+    > g = grad env0 f
 
     > g 
     fromList [(0,(6.0 * x)),(1,(3.0 * y^2.0))]
