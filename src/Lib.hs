@@ -7,7 +7,7 @@ import Data.Maybe
 
 
 -- | Binding environment; variables are indexed by integers
-newtype Env a = Env { unEnv :: IM.IntMap a} deriving (Eq, Functor)
+newtype Env a = Env {unEnv :: IM.IntMap a} deriving (Eq, Functor)
 instance Show a => Show (Env a) where show = show . IM.toList . unEnv
 
 -- newtype X = X { unX :: Int } deriving (Eq, Show)

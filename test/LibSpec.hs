@@ -3,6 +3,7 @@ module LibSpec where
 import Test.Hspec
 -- import Test.Hspec.QuickCheck
 
+import Lib
 import Numeric.SD
 
 import qualified Data.IntMap.Strict as IM
