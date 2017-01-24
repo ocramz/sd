@@ -50,10 +50,15 @@ This can be enhanced in multiple ways, for example by factoring out the recursio
 
 * https://jtobin.io/ad-via-recursion-schemes
 
-and perhaps by augmenting the abstract syntax with `Let` constructors to achieve _sharing of common sub-expressions_ :
+and perhaps by augmenting the abstract syntax with `Let` constructors to achieve _sharing of common sub-expressions_ [1]:
 
 * https://jtobin.io/sharing-in-haskell-edsls
 
 Alternatively, the free monad route lets us use `do` notation as well:
 
 * http://dlaing.org/cofun/posts/free_and_cofree.html
+
+
+## References
+
+[1] Ankner, J. and Svenningsson, J., An EDSL Approach to High Performance Haskell Programming

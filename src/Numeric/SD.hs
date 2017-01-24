@@ -98,6 +98,26 @@ fullSimplify expr = fullSimplify' expr (Const 0) -- placeholder
                           | otherwise = let c' = simplify c
                                         in fullSimplify' c' c
 
+-- | another little language
+fullSimplify' :: Eq c => (c -> c) -> c -> c
+fullSimplify' step = u . iterate step
+  where u (x₁ : x₂ : xs) | x₁ == x₂  = x₁ 
+                         | otherwise = u (x₂ : xs)
+
+-- data Op = Plus | Minus | Times | Divide deriving (Show, Eq)
+-- data Sym = Lit Double
+--          | Vari String
+--          | Expr Op Sym Sym deriving (Show, Eq)
+-- step e = case e of 
+--           Expr op (Lit n₁) (Lit n₂) ->
+--             Lit $ (case op of Plus -> (+);
+--                               Minus -> (-);
+--                               Times -> (*);
+--                               Divide -> (/)) n₁ n₂
+--           Expr op e₁ e₂    -> Expr op (step e₁) (step e₂)
+--           atom             -> atom    
+            
+
 
 
 
