@@ -106,6 +106,7 @@ simplify (a :^: b)  = simplify a :^: simplify b
 simplify (a :*: b)  = simplify a :*: simplify b
 simplify (a :+: b)  = simplify a :+: simplify b
 simplify (Log b x)  = Log b (simplify x)
+simplify (Exp (a :+: b)) = Exp (simplify a) :*: Exp (simplify b)
 simplify (Exp x)    = Exp (simplify x)
 simplify (Ln (Exp x)) = simplify x
 simplify x          = x
@@ -118,11 +119,11 @@ fullSimplify expr = fullSimplify' expr (Const 0) -- placeholder
                           | otherwise = let c' = simplify c
                                         in fullSimplify' c' c
 
--- | another little language
-fullSimplify' :: Eq c => (c -> c) -> c -> c
-fullSimplify' step = u . iterate step
-  where u (x₁ : x₂ : xs) | x₁ == x₂  = x₁ 
-                         | otherwise = u (x₂ : xs)
+-- -- | another little language
+-- fullSimplify' :: Eq c => (c -> c) -> c -> c
+-- fullSimplify' step = u . iterate step
+--   where u (x₁ : x₂ : xs) | x₁ == x₂  = x₁ 
+--                          | otherwise = u (x₂ : xs)
 
 -- data Op = Plus | Minus | Times | Divide deriving (Show, Eq)
 -- data Sym = Lit Double
@@ -159,7 +160,8 @@ diff e (Exp x) = diff e x :*: Exp x
 
 -- | Gradient
 grad :: (Floating a, Eq a) => Env a1 -> Expr a -> IM.IntMap (Expr a)
-grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr) e
+grad (Env e) expr = fullSimplify <$> IM.mapWithKey (\x _ -> diff x expr') e where
+  expr' = fullSimplify expr
 
 
 
@@ -177,9 +179,10 @@ eval e (a :*: b) = eval e a * eval e b
 eval e (a :-: b) = eval e a - eval e b
 eval e (a :/: b) = eval e a / eval e b
 eval e (a :^: b) = eval e a ** eval e b
+eval e (Exp a) = exp (eval e a)
 
 
-evalGrad :: (Floating a1, Eq a1) => Env a1 -> Expr a1 -> IM.IntMap a1
+evalGrad :: (Floating a, Eq a) => Env a -> Expr a -> IM.IntMap a
 evalGrad e expr = eval e <$> grad e expr
 
 

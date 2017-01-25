@@ -42,9 +42,9 @@ env0 :: Env Double
 env0 = Env $ IM.fromList [(ix, 5.0), (iy, 2.0)] -- x = 5, y = 2
 
 e0, e1 :: Expr Double
-e0 = Const 3 :*: (x :^: Const 2) :+: (y :^: Const 3)  --3x^2+y^3
+e0 = 3 * (x ** 2) + (y ** 3)  --3x^2+y^3
 
-e1 = Const 3 :*: (y :^: Const 2)  -- 3y^2
+e1 = 3 *(y ** 2)  -- 3y^2
 
 g0 = grad env0 e0   -- 6x, 3y^2
 
