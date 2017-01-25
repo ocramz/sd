@@ -77,6 +77,9 @@ simplify (Const a :+: Const b) = Const (a + b)
 simplify (a       :+: Const 0) = simplify a
 simplify (Const 0 :+: a      ) = simplify a
 
+simplify (Const 0 :-: a) = negate' (simplify a)
+simplify (a :-: Const 0) = simplify a
+
 simplify (Const a :*: Const b) = Const (a*b)
 simplify (a :*: Const 1)         = simplify a
 simplify (Const 1 :*: a)         = simplify a
