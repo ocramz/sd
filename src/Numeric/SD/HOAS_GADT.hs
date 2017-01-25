@@ -10,6 +10,7 @@ data Expr a where
   Const :: a -> Expr a
   Var :: Int -> Expr a
   Let :: Expr a -> (a -> Expr a) -> Expr a
+  Lambda :: (a -> Expr a) -> Expr a
   (:+:) :: Expr a -> Expr a -> Expr a 
   (:-:) :: Expr a -> Expr a -> Expr a 
   (:*:) :: Expr a -> Expr a -> Expr a 
