@@ -129,6 +129,7 @@ fullSimplify expr = fullSimplify' expr (Const 0) -- placeholder
 -- data Sym = Lit Double
 --          | Vari String
 --          | Expr Op Sym Sym deriving (Show, Eq)
+-- step :: Sym -> Sym           
 -- step e = case e of 
 --           Expr op (Lit n₁) (Lit n₂) ->
 --             Lit $ (case op of Plus -> (+);
