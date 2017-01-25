@@ -41,6 +41,8 @@ eval e s = case s of
 
 
 
+
+
 let_ e1 e2 = Let e1 (e2 . Const)
 
 one :: Num a => Expr a 
@@ -55,14 +57,36 @@ env0 = fromListEnv [(0, 0.0)]
 
 
 
---
+
+
+
+
+
+
+-- fun with recursion schemes
 
 data Fix f = In (f (Fix f))
+
+unFix :: Fix t -> t (Fix t)
+unFix (In f) = f
 
 para :: Functor f => (f (Fix f, t) -> t) -> Fix f -> t
 para psi (In ff) = psi (keepCopy <$> ff) where
   keepCopy x = (x, para psi x)
 
-para' :: Foldable t => (t1 -> [t1] -> c -> c) -> c -> t t1 -> c
-para'  c n = snd . foldr (\ x (xs, t) -> (x : xs, c x xs t)) ([], n)
+para0 :: (a -> ([a], b) -> b) -> b -> [a] -> b
+para0 psi z (x:xs) = psi x (xs, para0 psi z xs)
+para0 _   z []     = z
+
+paraL :: Foldable t => (t1 -> [t1] -> c -> c) -> c -> t t1 -> c
+paraL  c n = snd . foldr (\ x (xs, t) -> (x : xs, c x xs t)) ([], n)
+
 -- para' psi = snd . foldr (\ fxt -> (In (fst <$> fxt), psi fxt))
+
+
+
+
+kata, kata' :: Functor f => (f b -> b) -> Fix f -> b
+kata alg ff = alg . fmap (kata alg) $ unFix ff
+
+kata' alg ff = alg . fmap (kata' alg) $ unFix ff
